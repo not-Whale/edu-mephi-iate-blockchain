@@ -3,7 +3,6 @@ package edu.mephi.iate.blockchain.lab2.common.mappers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.mephi.iate.blockchain.lab2.dto.ContextDTO;
 import edu.mephi.iate.blockchain.lab2.dto.transactions.TransactionDTO;
 import edu.mephi.iate.blockchain.lab2.dto.transactions.TransactionsDTO;
 import lombok.experimental.UtilityClass;
@@ -31,25 +30,15 @@ public class TransactionsMapper {
 
     public static Optional<TransactionDTO> mapToTransactionDTO(String response) {
         try {
-           TransactionsDTO transactionsDTO = objectMapper.readValue(response, TransactionsDTO.class);
-           List<TransactionDTO> transactionDTOList = transactionsDTO.getTransactions();
-           if (!transactionDTOList.isEmpty()) {
-               return Optional.of(transactionDTOList.getFirst());
-           } else {
-               return Optional.empty();
-           }
+            TransactionsDTO transactionsDTO = objectMapper.readValue(response, TransactionsDTO.class);
+            List<TransactionDTO> transactionDTOList = transactionsDTO.getTransactions();
+            if (!transactionDTOList.isEmpty()) {
+                return Optional.of(transactionDTOList.getFirst());
+            } else {
+                return Optional.empty();
+            }
         } catch (JsonProcessingException e) {
             log.error("Error during mapping TransactionDTO. Message: {}", e.getMessage());
-            return Optional.empty();
-        }
-    }
-
-    public static Optional<ContextDTO> mapToContextDTO(String response) {
-        try {
-            TransactionsDTO transactionsDTO = objectMapper.readValue(response, TransactionsDTO.class);
-            return Optional.of(transactionsDTO.getContext());
-        } catch (JsonProcessingException e) {
-            log.error("Error during mapping ContextDTO. Message: {}", e.getMessage());
             return Optional.empty();
         }
     }
