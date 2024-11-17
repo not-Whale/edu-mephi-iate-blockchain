@@ -4,9 +4,9 @@ import edu.mephi.iate.blockchain.lab2.common.mappers.BlocksMapper;
 import edu.mephi.iate.blockchain.lab2.common.mappers.CountMapper;
 import edu.mephi.iate.blockchain.lab2.common.mappers.OutputsMapper;
 import edu.mephi.iate.blockchain.lab2.common.mappers.TransactionsMapper;
+import edu.mephi.iate.blockchain.lab2.dto.blocks.BlockDTO;
 import edu.mephi.iate.blockchain.lab2.dto.blocks.BlocksDTO;
 import edu.mephi.iate.blockchain.lab2.dto.counts.CountDTO;
-import edu.mephi.iate.blockchain.lab2.dto.blocks.BlockDTO;
 import edu.mephi.iate.blockchain.lab2.dto.outputs.OutputDTO;
 import edu.mephi.iate.blockchain.lab2.dto.outputs.OutputsDTO;
 import edu.mephi.iate.blockchain.lab2.dto.transactions.TransactionDTO;
@@ -46,7 +46,7 @@ public class BlockchairAPIUtils {
         Optional<String> response = httpClient.get(
                 BlockchairInfinitableEndpointEnum.TRANSACTIONS,
                 Map.of(BlockchairInfinitableEndpointParameterEnum.WHERE, List.of("time(2022-10-11)"),
-                        BlockchairInfinitableEndpointParameterEnum.ORDER_BY, List.of("block_id(asc)" , "id(asc)"),
+                        BlockchairInfinitableEndpointParameterEnum.ORDER_BY, List.of("block_id(asc)", "id(asc)"),
                         BlockchairInfinitableEndpointParameterEnum.LIMIT, List.of("1"))
         );
         return response.isPresent() ? TransactionsMapper.mapToTransactionDTO(response.get()) : Optional.empty();
@@ -116,14 +116,11 @@ public class BlockchairAPIUtils {
                         BlockchairInfinitableEndpointParameterEnum.ORDER_BY, List.of("id(asc)"),
                         BlockchairInfinitableEndpointParameterEnum.LIMIT, List.of("3"))
         );
-        if (response.isEmpty()) {
-            return List.of();
-        }
-        return TransactionsMapper.mapToTransactionsDTO(response.get())
+        return response.map(responseBlocks -> TransactionsMapper.mapToTransactionsDTO(responseBlocks)
                 .map(transactionsDTO -> transactionsDTO.getTransactions().stream()
                         .map(TransactionDTO::getHash)
                         .toList())
-                .orElseGet(List::of);
+                .orElseGet(List::of)).orElseGet(List::of);
     }
 
     /**
@@ -132,13 +129,13 @@ public class BlockchairAPIUtils {
     public static Long countAllBlocks2022_10_01() {
         Optional<String> response = httpClient.get(
                 BlockchairInfinitableEndpointEnum.BLOCKS,
-            Map.of(BlockchairInfinitableEndpointParameterEnum.WHERE, List.of("time(2022-10-01)"),
-                    BlockchairInfinitableEndpointParameterEnum.GROUP_BY, List.of("count()"))
+                Map.of(BlockchairInfinitableEndpointParameterEnum.WHERE, List.of("time(2022-10-01)"),
+                        BlockchairInfinitableEndpointParameterEnum.GROUP_BY, List.of("count()"))
         );
-        if (response.isEmpty()) {
-            return 0L;
-        }
-        return CountMapper.mapToCountDTO(response.get()).map(CountDTO::getCount).orElse(0L);
+        return response.map(responseBlocks -> CountMapper.mapToCountDTO(responseBlocks)
+                        .map(CountDTO::getCount)
+                        .orElse(0L))
+                .orElse(0L);
     }
 
     /**
@@ -151,16 +148,13 @@ public class BlockchairAPIUtils {
                         BlockchairInfinitableEndpointParameterEnum.ORDER_BY, List.of("input_total_usd(desc)"),
                         BlockchairInfinitableEndpointParameterEnum.LIMIT, List.of("10"))
         );
-        if (response.isEmpty()) {
-            return List.of();
-        }
-        return TransactionsMapper.mapToTransactionsDTO(response.get())
-                .map(TransactionsDTO::getTransactions)
+        return response.map(responseTransactions -> TransactionsMapper.mapToTransactionsDTO(responseTransactions)
+                        .map(TransactionsDTO::getTransactions)
+                        .orElseGet(List::of))
                 .orElseGet(List::of);
     }
 
     /**
-     *
      * Вопрос 7: Адрес майнер, кто получил наибольшее количество комиссии за 02.10.2022.
      */
     public static Optional<String> getAddressWithMaxFee2022_10_02() {
@@ -186,13 +180,8 @@ public class BlockchairAPIUtils {
         if (response.isEmpty()) {
             return Optional.empty();
         }
-
         Optional<OutputDTO> outputDTOOpt = OutputsMapper.mapToOutputDTO(response.get());
-        if (outputDTOOpt.isEmpty()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(outputDTOOpt.get().getRecipient());
+        return outputDTOOpt.map(OutputDTO::getRecipient);
     }
 
     /**
