@@ -9,7 +9,6 @@ public enum BlockchairInfinitableEndpointParameterEnum {
     WHERE("q"),
     ORDER_BY("s"),
     LIMIT("limit"),
-    OFFSET("offset"),
     GROUP_BY("a");
 
     private final String parameterName;

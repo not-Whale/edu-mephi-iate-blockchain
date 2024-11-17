@@ -1,7 +1,7 @@
 package edu.mephi.iate.blockchain.lab2.http_client;
 
-import edu.mephi.iate.blockchain.lab2.enums.BlockchairInfinitableEndpointParameterEnum;
 import edu.mephi.iate.blockchain.lab2.enums.BlockchairInfinitableEndpointEnum;
+import edu.mephi.iate.blockchain.lab2.enums.BlockchairInfinitableEndpointParameterEnum;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class BitcoinStatsBlockchairAPIHttpClient implements AutoCloseable {
                 }
             }
         }
-        requestURI = requestURI.resolve(endpoint.getEndpointName() + paramsString.toString());
+        requestURI = requestURI.resolve(endpoint.getEndpointName() + paramsString);
 
         HttpRequest getRequest = HttpRequest.newBuilder()
                 .GET()
